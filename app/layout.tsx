@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="bg-black min-h-screen flex justify-center items-start">
-        <div className="w-full max-w-[390px] relative">
+        <div className="w-full max-w-[430px] mx-auto relative">
           {children}
         </div>
       </body>

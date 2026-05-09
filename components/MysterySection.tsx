@@ -22,6 +22,24 @@ export default function MysterySection() {
   const textY = useTransform(scrollYProgress, [0.75, 0.9], [16, 0]);
   const scrollIndicatorOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
 
+  // Resize canvas internal resolution to match CSS display size
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+      }
+    });
+
+    observer.observe(canvas);
+    return () => observer.disconnect();
+  }, []);
+
   // Preload all frames
   useEffect(() => {
     const images: HTMLImageElement[] = new Array(TOTAL_FRAMES);
@@ -40,7 +58,7 @@ export default function MysterySection() {
     framesRef.current = images;
   }, []);
 
-  // Draw frame to canvas — cover fit
+  // Draw frame with object-cover crop
   function drawFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
     const cw = ctx.canvas.width;
     const ch = ctx.canvas.height;
@@ -63,7 +81,7 @@ export default function MysterySection() {
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
   }
 
-  // RAF loop — scroll → frame index → canvas draw
+  // RAF loop — scroll progress → frame index → canvas draw
   useEffect(() => {
     if (!ready) return;
 
@@ -93,7 +111,6 @@ export default function MysterySection() {
       rafId = requestAnimationFrame(tick);
     };
 
-    // Draw first frame immediately
     const first = framesRef.current[0];
     if (first?.complete) drawFrame(ctx, first);
 
@@ -105,22 +122,17 @@ export default function MysterySection() {
     <div ref={containerRef} className="relative h-[500vh]">
       <div className="sticky top-0 h-[100dvh] overflow-hidden bg-black">
 
-        {/* Canvas — frame sequence player */}
         <canvas
           ref={canvasRef}
-          width={390}
-          height={844}
           className="absolute inset-0 w-full h-full"
         />
 
-        {/* Loading indicator */}
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
           </div>
         )}
 
-        {/* Mystery text */}
         <motion.div
           className="absolute bottom-24 left-0 right-0 flex flex-col items-center gap-2 px-8"
           style={{ opacity: textOpacity, y: textY }}
@@ -133,7 +145,6 @@ export default function MysterySection() {
           </p>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2"
           style={{ opacity: scrollIndicatorOpacity }}
