@@ -1,16 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll, motion } from "motion/react";
-import { MotionValue } from "motion/react";
+import { useScroll, useTransform, motion, MotionValue } from "motion/react";
 
 interface ScrollSectionProps {
   framesPath: string;
   totalFrames: number;
+  exitTransition?: boolean;
   children?: (scrollYProgress: MotionValue<number>) => React.ReactNode;
 }
 
-export default function ScrollSection({ framesPath, totalFrames, children }: ScrollSectionProps) {
+export default function ScrollSection({
+  framesPath,
+  totalFrames,
+  exitTransition = false,
+  children,
+}: ScrollSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const framesRef = useRef<HTMLImageElement[]>([]);
@@ -20,6 +25,10 @@ export default function ScrollSection({ framesPath, totalFrames, children }: Scr
     target: containerRef,
     offset: ["start start", "end end"],
   });
+
+  // Exit transition: zoom into lantern area + fade to black
+  const exitScale = useTransform(scrollYProgress, [0.82, 1], [1, 1.45]);
+  const exitFade  = useTransform(scrollYProgress, [0.82, 1], [0, 1]);
 
   // Sync canvas internal resolution to display size
   useEffect(() => {
@@ -53,7 +62,6 @@ export default function ScrollSection({ framesPath, totalFrames, children }: Scr
     framesRef.current = images;
   }, [framesPath, totalFrames]);
 
-  // Draw frame — object-cover crop
   function drawFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
     const cw = ctx.canvas.width;
     const ch = ctx.canvas.height;
@@ -70,7 +78,6 @@ export default function ScrollSection({ framesPath, totalFrames, children }: Scr
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
   }
 
-  // RAF loop
   useEffect(() => {
     if (!ready) return;
     const canvas = canvasRef.current;
@@ -100,7 +107,22 @@ export default function ScrollSection({ framesPath, totalFrames, children }: Scr
   return (
     <div ref={containerRef} className="relative h-[500vh]">
       <div className="sticky top-0 h-[100dvh] overflow-hidden bg-black">
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+
+        {/* Canvas wrapper — zoom centered on lantern area (bottom-center) */}
+        <motion.div
+          className="absolute inset-0"
+          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 72%" } : undefined}
+        >
+          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+        </motion.div>
+
+        {/* Black fade overlay for exit */}
+        {exitTransition && (
+          <motion.div
+            className="absolute inset-0 bg-black pointer-events-none"
+            style={{ opacity: exitFade }}
+          />
+        )}
 
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -108,14 +130,7 @@ export default function ScrollSection({ framesPath, totalFrames, children }: Scr
           </div>
         )}
 
-        {/* Overlay content gets scrollYProgress via render prop */}
         {children?.(scrollYProgress)}
-
-        <motion.div
-          className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2"
-          style={{ opacity: scrollYProgress }}
-        >
-        </motion.div>
       </div>
     </div>
   );
