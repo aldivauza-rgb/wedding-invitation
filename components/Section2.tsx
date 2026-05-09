@@ -19,7 +19,7 @@ function Overlay({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) 
 
 export default function Section2() {
   return (
-    <ScrollSection framesPath="/assets/s2/frames" totalFrames={192}>
+    <ScrollSection framesPath="/assets/s2/frames" totalFrames={192} enterTransition>
       {(scrollYProgress) => <Overlay scrollYProgress={scrollYProgress} />}
     </ScrollSection>
   );

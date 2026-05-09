@@ -7,6 +7,7 @@ interface ScrollSectionProps {
   framesPath: string;
   totalFrames: number;
   exitTransition?: boolean;
+  enterTransition?: boolean;
   children?: (scrollYProgress: MotionValue<number>) => React.ReactNode;
 }
 
@@ -14,6 +15,7 @@ export default function ScrollSection({
   framesPath,
   totalFrames,
   exitTransition = false,
+  enterTransition = false,
   children,
 }: ScrollSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -26,9 +28,11 @@ export default function ScrollSection({
     offset: ["start start", "end end"],
   });
 
-  // Exit transition: zoom into shadow between chairs + fade to black
-  const exitScale = useTransform(scrollYProgress, [0.8, 1], [1, 2.8]);
-  const exitFade  = useTransform(scrollYProgress, [0.88, 1], [0, 1]);
+  // Exit: zoom into black dot + fade to black
+  const exitScale = useTransform(scrollYProgress, [0.78, 1], [1, 3.5]);
+  const exitFade  = useTransform(scrollYProgress, [0.84, 0.96], [0, 1]);
+  // Enter: fade in from black
+  const enterFade = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
 
   // Sync canvas internal resolution to display size
   useEffect(() => {
@@ -111,7 +115,7 @@ export default function ScrollSection({
         {/* Canvas wrapper — zoom centered on lantern area (bottom-center) */}
         <motion.div
           className="absolute inset-0"
-          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 52%" } : undefined}
+          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 62%" } : undefined}
         >
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
         </motion.div>
@@ -121,6 +125,14 @@ export default function ScrollSection({
           <motion.div
             className="absolute inset-0 bg-black pointer-events-none"
             style={{ opacity: exitFade }}
+          />
+        )}
+
+        {/* Black fade overlay for enter */}
+        {enterTransition && (
+          <motion.div
+            className="absolute inset-0 bg-black pointer-events-none"
+            style={{ opacity: enterFade }}
           />
         )}
 
