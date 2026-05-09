@@ -69,15 +69,18 @@ export default function ScrollSection({
   function drawFrame(ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
     const cw = ctx.canvas.width;
     const ch = ctx.canvas.height;
-    const imgAspect = img.naturalWidth / img.naturalHeight;
+    // Crop bottom 8% to remove Veo watermark
+    const srcW = img.naturalWidth;
+    const srcH = img.naturalHeight * 0.92;
+    const imgAspect = srcW / srcH;
     const canvasAspect = cw / ch;
     let sx, sy, sw, sh;
     if (imgAspect > canvasAspect) {
-      sh = img.naturalHeight; sw = sh * canvasAspect;
-      sx = (img.naturalWidth - sw) / 2; sy = 0;
+      sh = srcH; sw = sh * canvasAspect;
+      sx = (srcW - sw) / 2; sy = 0;
     } else {
-      sw = img.naturalWidth; sh = sw / canvasAspect;
-      sx = 0; sy = (img.naturalHeight - sh) / 2;
+      sw = srcW; sh = sw / canvasAspect;
+      sx = 0; sy = (srcH - sh) / 2;
     }
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
   }
