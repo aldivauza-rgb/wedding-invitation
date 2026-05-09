@@ -26,9 +26,9 @@ export default function ScrollSection({
     offset: ["start start", "end end"],
   });
 
-  // Exit transition: zoom into lantern area + fade to black
-  const exitScale = useTransform(scrollYProgress, [0.82, 1], [1, 1.45]);
-  const exitFade  = useTransform(scrollYProgress, [0.82, 1], [0, 1]);
+  // Exit transition: zoom into shadow between chairs + fade to black
+  const exitScale = useTransform(scrollYProgress, [0.8, 1], [1, 2.8]);
+  const exitFade  = useTransform(scrollYProgress, [0.88, 1], [0, 1]);
 
   // Sync canvas internal resolution to display size
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function ScrollSection({
         {/* Canvas wrapper — zoom centered on lantern area (bottom-center) */}
         <motion.div
           className="absolute inset-0"
-          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 72%" } : undefined}
+          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 52%" } : undefined}
         >
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
         </motion.div>
