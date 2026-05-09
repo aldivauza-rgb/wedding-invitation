@@ -3,6 +3,37 @@
 import { useRef } from "react";
 import { useScroll, useTransform, motion } from "motion/react";
 
+function FadeItem({
+  scrollYProgress,
+  inStart,
+  inEnd,
+  outStart,
+  outEnd,
+  children,
+  className,
+}: {
+  scrollYProgress: any;
+  inStart: number;
+  inEnd: number;
+  outStart: number;
+  outEnd: number;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const opacity = useTransform(
+    scrollYProgress,
+    [inStart, inEnd, outStart, outEnd],
+    [0, 1, 1, 0]
+  );
+  const y = useTransform(scrollYProgress, [inStart, inEnd], [22, 0]);
+
+  return (
+    <motion.div style={{ opacity, y }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
 export default function StorySection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -11,14 +42,8 @@ export default function StorySection() {
     offset: ["start start", "end end"],
   });
 
-  // Parallax: fade in smooth on enter, float up, fade out on exit
-  const textScale    = useTransform(scrollYProgress, [0, 0.15], [1.08, 1]);
-  const textOpacity  = useTransform(scrollYProgress, [0, 0.12, 0.78, 1], [0, 1, 1, 0]);
-  const textY        = useTransform(scrollYProgress, [0, 1], ["-2%", "-18%"]);
-  const titleSpacing = useTransform(scrollYProgress, [0, 0.15], ["0.14em", "0.04em"]);
-
   return (
-    <div ref={containerRef} className="relative h-[300vh]">
+    <div ref={containerRef} className="relative h-[400vh]">
       <div
         className="sticky top-0 h-[100dvh] overflow-hidden flex items-center justify-center pb-16"
         style={{
@@ -40,35 +65,47 @@ export default function StorySection() {
           style={{ background: "linear-gradient(to bottom, transparent, #050A14)" }}
         />
 
-        {/* Parallax text block */}
-        <motion.div
-          style={{ scale: textScale, opacity: textOpacity, y: textY }}
-          className="relative flex flex-col items-center gap-7 max-w-sm text-center px-8"
-        >
-          <motion.h2
-            style={{ letterSpacing: titleSpacing }}
-            className="text-white text-[2rem] font-light leading-snug"
-          >
-            Dua Jiwa,<br />Satu Perjalanan
-          </motion.h2>
+        <div className="relative flex flex-col items-center gap-7 max-w-sm text-center px-8">
 
-          <div className="w-6 h-px bg-white/50" />
+          {/* 1. Judul */}
+          <FadeItem scrollYProgress={scrollYProgress}
+            inStart={0.02} inEnd={0.12} outStart={0.82} outEnd={0.95}>
+            <h2 className="text-white text-[2rem] font-light leading-snug tracking-wide">
+              Dua Jiwa,<br />Satu Perjalanan
+            </h2>
+          </FadeItem>
 
-          <div className="flex flex-col gap-5 text-white/90 text-[15px] leading-[1.9] font-light">
-            <p>
+          {/* 2. Divider */}
+          <FadeItem scrollYProgress={scrollYProgress}
+            inStart={0.1} inEnd={0.18} outStart={0.82} outEnd={0.95}>
+            <div className="w-6 h-px bg-white/50" />
+          </FadeItem>
+
+          {/* 3. Paragraf pertama */}
+          <FadeItem scrollYProgress={scrollYProgress}
+            inStart={0.18} inEnd={0.28} outStart={0.82} outEnd={0.95}>
+            <p className="text-white/90 text-[15px] leading-[1.9] font-light">
               Setiap cinta punya awal ceritanya sendiri —
               sebuah momen kecil yang tanpa disadari
               mengubah segalanya.
             </p>
-            <p>
+          </FadeItem>
+
+          {/* 4. Paragraf kedua */}
+          <FadeItem scrollYProgress={scrollYProgress}
+            inStart={0.3} inEnd={0.4} outStart={0.82} outEnd={0.95}>
+            <p className="text-white/90 text-[15px] leading-[1.9] font-light">
               Bukan sekadar kebetulan.
               Melainkan sebuah perjalanan
               yang sejak awal memang menuju ke sini —
               ke sebuah janji yang abadi.
             </p>
-          </div>
+          </FadeItem>
 
-          <div className="mt-1 px-2">
+          {/* 5. Quote */}
+          <FadeItem scrollYProgress={scrollYProgress}
+            inStart={0.44} inEnd={0.55} outStart={0.82} outEnd={0.95}
+            className="px-2">
             <p className="text-white/80 text-sm italic leading-relaxed font-light">
               "Dan di antara tanda-tanda kebesaran-Nya,
               Dia menciptakan pasangan untukmu
@@ -77,8 +114,9 @@ export default function StorySection() {
             <p className="text-white/50 text-xs mt-2 tracking-widest uppercase">
               QS. Ar-Rum: 21
             </p>
-          </div>
-        </motion.div>
+          </FadeItem>
+
+        </div>
       </div>
     </div>
   );
