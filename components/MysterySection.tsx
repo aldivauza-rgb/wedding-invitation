@@ -33,7 +33,7 @@ function Overlay({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) 
 
 export default function MysterySection() {
   return (
-    <ScrollSection framesPath="/assets/s1/frames" totalFrames={192} exitTransition>
+    <ScrollSection framesPath="/assets/s1/frames" totalFrames={192} exitToBlack>
       {(scrollYProgress) => <Overlay scrollYProgress={scrollYProgress} />}
     </ScrollSection>
   );

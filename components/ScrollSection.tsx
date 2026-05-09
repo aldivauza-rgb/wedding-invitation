@@ -6,16 +6,16 @@ import { useScroll, useTransform, motion, MotionValue } from "motion/react";
 interface ScrollSectionProps {
   framesPath: string;
   totalFrames: number;
-  exitTransition?: boolean;
-  enterTransition?: boolean;
+  exitToBlack?: boolean;
+  lavigneEnter?: boolean;
   children?: (scrollYProgress: MotionValue<number>) => React.ReactNode;
 }
 
 export default function ScrollSection({
   framesPath,
   totalFrames,
-  exitTransition = false,
-  enterTransition = false,
+  exitToBlack = false,
+  lavigneEnter = false,
   children,
 }: ScrollSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -28,13 +28,14 @@ export default function ScrollSection({
     offset: ["start start", "end end"],
   });
 
-  // Exit: zoom into black dot + fade to black
+  // EXIT: zoom into black shadow → full black
   const exitScale = useTransform(scrollYProgress, [0.78, 1], [1, 3.5]);
-  const exitFade  = useTransform(scrollYProgress, [0.84, 0.96], [0, 1]);
-  // Enter: fade in from black
-  const enterFade = useTransform(scrollYProgress, [0, 0.06], [1, 0]);
+  const exitFade  = useTransform(scrollYProgress, [0.82, 0.95], [0, 1]);
 
-  // Sync canvas internal resolution to display size
+  // ENTER (Lavigne): pure black → navy vignette opens wide → full reveal
+  const lavigneBlack   = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  const lavigneVignette = useTransform(scrollYProgress, [0, 0.18], [1, 0]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -50,7 +51,6 @@ export default function ScrollSection({
     return () => observer.disconnect();
   }, []);
 
-  // Preload frames
   useEffect(() => {
     const images: HTMLImageElement[] = new Array(totalFrames);
     let loaded = 0;
@@ -112,28 +112,39 @@ export default function ScrollSection({
     <div ref={containerRef} className="relative h-[500vh]">
       <div className="sticky top-0 h-[100dvh] overflow-hidden bg-black">
 
-        {/* Canvas wrapper — zoom centered on lantern area (bottom-center) */}
+        {/* Canvas — with optional exit zoom */}
         <motion.div
           className="absolute inset-0"
-          style={exitTransition ? { scale: exitScale, transformOrigin: "50% 62%" } : undefined}
+          style={exitToBlack ? { scale: exitScale, transformOrigin: "50% 62%" } : undefined}
         >
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
         </motion.div>
 
-        {/* Black fade overlay for exit */}
-        {exitTransition && (
+        {/* EXIT: black fade overlay */}
+        {exitToBlack && (
           <motion.div
             className="absolute inset-0 bg-black pointer-events-none"
             style={{ opacity: exitFade }}
           />
         )}
 
-        {/* Black fade overlay for enter */}
-        {enterTransition && (
-          <motion.div
-            className="absolute inset-0 bg-black pointer-events-none"
-            style={{ opacity: enterFade }}
-          />
+        {/* ENTER: Lavigne — navy vignette opening wide from black */}
+        {lavigneEnter && (
+          <>
+            {/* 1. Pure black snaps away quickly */}
+            <motion.div
+              className="absolute inset-0 bg-black pointer-events-none"
+              style={{ opacity: lavigneBlack }}
+            />
+            {/* 2. Navy vignette lingers at edges, reveals center first */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: "radial-gradient(ellipse 90% 70% at 50% 50%, transparent 0%, transparent 35%, #050D1A 70%, #020509 100%)",
+                opacity: lavigneVignette,
+              }}
+            />
+          </>
         )}
 
         {!ready && (
