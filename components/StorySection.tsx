@@ -30,11 +30,11 @@ export default function StorySection() {
         }}
       />
 
-      {/* Gradient top — smooth blend from section above */}
-      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
-
-      {/* Gradient bottom — smooth blend into Section 2 */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-black/40 pointer-events-none" />
+      {/* Gradient bottom — blend into Section 2 dark navy */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none"
+        style={{ background: "linear-gradient(to bottom, transparent, #050A14)" }}
+      />
 
       <motion.div
         style={{ opacity, y }}
