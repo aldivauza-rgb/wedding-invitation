@@ -11,16 +11,16 @@ export default function StorySection() {
     offset: ["start start", "end end"],
   });
 
-  // Parallax: text enters wide/scaled, settles, then floats up on exit
-  const textScale   = useTransform(scrollYProgress, [0, 0.2], [1.12, 1]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.18, 0.75, 1], [0, 1, 1, 0]);
-  const textY       = useTransform(scrollYProgress, [0, 1], ["4%", "-12%"]);
-  const titleSpacing = useTransform(scrollYProgress, [0, 0.2], ["0.15em", "0.04em"]);
+  // Parallax: fade in smooth on enter, float up, fade out on exit
+  const textScale    = useTransform(scrollYProgress, [0, 0.15], [1.08, 1]);
+  const textOpacity  = useTransform(scrollYProgress, [0, 0.12, 0.78, 1], [0, 1, 1, 0]);
+  const textY        = useTransform(scrollYProgress, [0, 1], ["-2%", "-18%"]);
+  const titleSpacing = useTransform(scrollYProgress, [0, 0.15], ["0.14em", "0.04em"]);
 
   return (
     <div ref={containerRef} className="relative h-[300vh]">
       <div
-        className="sticky top-0 h-[100dvh] overflow-hidden flex items-center justify-center"
+        className="sticky top-0 h-[100dvh] overflow-hidden flex items-center justify-center pb-16"
         style={{
           background: "linear-gradient(160deg, #F08878 0%, #E86A58 55%, #D95E50 100%)",
         }}
