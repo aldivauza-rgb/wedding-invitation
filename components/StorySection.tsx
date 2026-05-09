@@ -10,50 +10,57 @@ export default function StorySection() {
     offset: ["start 90%", "end 10%"],
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.2], [40, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.15], [32, 0]);
 
   return (
     <div
       ref={ref}
-      className="min-h-screen w-full flex flex-col items-center justify-center px-8 py-24"
-      style={{ backgroundColor: "#E8725E" }}
+      className="relative min-h-screen w-full flex flex-col items-center justify-center px-8 py-24 overflow-hidden"
+      style={{
+        background: "linear-gradient(160deg, #F08878 0%, #E86A58 50%, #D95E50 100%)",
+      }}
     >
+      {/* Noise texture overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.12] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+          backgroundSize: "180px 180px",
+        }}
+      />
+
+      {/* Gradient top — smooth blend from section above */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/20 to-transparent pointer-events-none" />
+
+      {/* Gradient bottom — smooth blend into Section 2 */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-black/40 pointer-events-none" />
+
       <motion.div
         style={{ opacity, y }}
-        className="flex flex-col items-center gap-8 max-w-sm text-center"
+        className="relative flex flex-col items-center gap-7 max-w-sm text-center"
       >
-        {/* Ornament atas */}
-        <div className="flex items-center gap-3 w-full justify-center">
-          <div className="h-px flex-1 bg-white/40" />
-          <span className="text-white/60 text-xs tracking-[0.4em] uppercase font-light">
-            our story
-          </span>
-          <div className="h-px flex-1 bg-white/40" />
-        </div>
-
         {/* Judul */}
-        <h2 className="text-white text-3xl font-light leading-snug tracking-wide">
+        <h2 className="text-white text-[2rem] font-light leading-snug tracking-wide">
           Dua Jiwa,<br />Satu Perjalanan
         </h2>
 
-        {/* Divider */}
-        <div className="w-8 h-px bg-white/50" />
+        {/* Divider tipis */}
+        <div className="w-6 h-px bg-white/50" />
 
         {/* Body copy */}
-        <div className="flex flex-col gap-5 text-white/85 text-[15px] leading-[1.85] font-light">
+        <div className="flex flex-col gap-5 text-white/90 text-[15px] leading-[1.9] font-light">
           <p>
             Setiap cinta punya awal ceritanya sendiri —
             sebuah momen kecil yang tanpa disadari
             mengubah segalanya.
           </p>
           <p>
-            Begitu pula dengan <em>Mawan dan Wawan</em>.
             Dua jiwa yang bertemu di persimpangan waktu,
             saling menemukan dalam diam yang penuh makna,
             dan perlahan tumbuh menjadi satu
-            dalam kepercayaan, kebersamaan, dan cinta
-            yang dengan sadar memilih.
+            dalam kepercayaan, kebersamaan,
+            dan cinta yang dengan sadar memilih.
           </p>
           <p>
             Bukan sekadar kebetulan.
@@ -63,9 +70,9 @@ export default function StorySection() {
           </p>
         </div>
 
-        {/* Quote */}
-        <div className="mt-2 px-4 py-5 border border-white/25 rounded-sm w-full">
-          <p className="text-white text-sm italic leading-relaxed font-light">
+        {/* Quote tanpa border */}
+        <div className="mt-1 px-2">
+          <p className="text-white/80 text-sm italic leading-relaxed font-light">
             "Dan di antara tanda-tanda kebesaran-Nya,
             Dia menciptakan pasangan untukmu
             agar kamu menemukan ketenangan."
@@ -73,13 +80,6 @@ export default function StorySection() {
           <p className="text-white/50 text-xs mt-2 tracking-widest uppercase">
             QS. Ar-Rum: 21
           </p>
-        </div>
-
-        {/* Ornament bawah */}
-        <div className="flex items-center gap-3 w-full justify-center mt-2">
-          <div className="h-px flex-1 bg-white/40" />
-          <div className="w-1.5 h-1.5 rounded-full bg-white/40" />
-          <div className="h-px flex-1 bg-white/40" />
         </div>
       </motion.div>
     </div>
